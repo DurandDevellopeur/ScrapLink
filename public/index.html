@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Analyzer Pro - Outil d'Analyse et Scraping Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .sections-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #64b5f6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e3f2fd;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #64b5f6;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #64b5f6;
+        }
+
+        .advanced-options {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .advanced-options h3 {
+            margin-bottom: 15px;
+            color: #81c784;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-scan {
+            background: linear-gradient(45deg, #f44336, #e57373);
+        }
+
+        .btn-scan:hover {
+            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 4px solid #64b5f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-header {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .critical { color: #f44336; }
+        .medium { color: #ff9800; }
+        .low { color: #4caf50; }
+
+        .page-result {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #64b5f6;
+        }
+
+        .page-url {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .vulnerability {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+
+        .vulnerability.medium {
+            background: rgba(255, 152, 0, 0.2);
+            border-color: rgba(255, 152, 0, 0.5);
+        }
+
+        .vulnerability.low {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+
+        .vuln-type {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .vuln-details {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+
+        .vuln-recommendation {
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .page-content {
+            margin-top: 15px;
+        }
+
+        .content-section {
+            margin-bottom: 15px;
+        }
+
+        .content-section h4 {
+            color: #64b5f6;
+            margin-bottom: 8px;
+        }
+
+        .links-list, .images-list, .forms-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .link-item, .image-item, .form-item {
+            padding: 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .link-item:last-child, .image-item:last-child, .form-item:last-child {
+            border-bottom: none;
+        }
+
+        .external-link {
+            color: #ffab91;
+        }
+
+        .internal-link {
+            color: #81c784;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🛡️ Cyber Analyzer Pro</h1>
+            <p>Outil complet d'analyse de sécurité et de scraping web avancé</p>
+        </header>
+
+        <div class="sections-grid">
+            <!-- Section Analyse de Sécurité -->
+            <div class="section">
+                <h2>🔍 Analyse de Sécurité</h2>
+                <form id="scanForm">
+                    <div class="form-group">
+                        <label for="scanUrl">URL à analyser :</label>
+                        <input type="url" id="scanUrl" class="form-control" placeholder="https://exemple.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scanDepth">Profondeur d'analyse (nombre de pages) :</label>
+                        <input type="number" id="scanDepth" class="form-control" min="1" max="100" value="1">
+                    </div>
+
+                    <div class="advanced-options">
+                        <h3>⚙️ Options avancées</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="scanUserAgent">User-Agent :</label>
+                                <select id="scanUserAgent" class="form-control">
+                                    <option value="desktop">Alyze (desktop)</option>
+                                    <option value="mobile">Mobile</option>
+                                    <option value="alyze">Alyze-Bot</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="scanLocation">Localisation :</label>
+                                <select id="scanLocation" class="form-control">
+                                    <option value="france">France (Paris)</option>
+                                    <option value="us">États-Unis</option>
+                                    <option value="spain">Espagne</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="scanAssets" checked>
+                            <label for="scanAssets">Inclure les assets (CSS/JS/images)</label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="scanRedirects" checked>
+                            <label for="scanRedirects">Suivre les redirections</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-scan">🔍 Analyser</button>
+                </form>
+
+                <div class="loading" id="scanLoading">
+                    <div class="spinner"></div>
+                    <p>Analyse en cours...</p>
+                </div>
+            </div>
+
+            <!-- Section Scraping Avancé -->
+            <div class="section">
+                <h2>🕸️ Scraping Avancé</h2>
+                <form id="scrapeForm">
+                    <div class="form-group">
+                        <label for="scrapeUrl">URL à scraper :</label>
+                        <input type="url" id="scrapeUrl" class="form-control" placeholder="https://exemple.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scrapePages">Nombre de pages à télécharger :</label>
+                        <input type="number" id="scrapePages" class="form-control" min="1" max="100" value="5">
+                    </div>
+
+                    <div class="advanced-options">
+                        <h3>⚙️ Options avancées</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="scrapeUserAgent">User-Agent :</label>
+                                <select id="scrapeUserAgent" class="form-control">
+                                    <option value="desktop">Alyze (desktop)</option>
+                                    <option value="mobile">Mobile</option>
+                                    <option value="alyze">Alyze-Bot</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="scrapeLocation">Localisation :</label>
+                                <select id="scrapeLocation" class="form-control">
+                                    <option value="france">France (Paris)</option>
+                                    <option value="us">États-Unis</option>
+                                    <option value="spain">Espagne</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="scrapeAssets" checked>
+                            <label for="scrapeAssets">Inclure assets (CSS/JS/images)</label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="scrapeRedirects" checked>
+                            <label for="scrapeRedirects">Suivre les redirections</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">🕸️ Scraper</button>
+                </form>
+
+                <div class="loading" id="scrapeLoading">
+                    <div class="spinner"></div>
+                    <p>Scraping en cours...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Résultats -->
+        <div class="results" id="results">
+            <div class="results-header">
+                <h2 id="resultsTitle">Résultats</h2>
+                <div id="resultsSummary"></div>
+            </div>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentResults = null;
+        let currentMode = null;
+
+        // Gestion du formulaire d'analyse
+        document.getElementById('scanForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const url = document.getElementById('scanUrl').value;
+            const depth = parseInt(document.getElementById('scanDepth').value);
+            const includeAssets = document.getElementById('scanAssets').checked;
+            const userAgent = document.getElementById('scanUserAgent').value;
+            const location = document.getElementById('scanLocation').value;
+            const followRedirects = document.getElementById('scanRedirects').checked;
+
+            if (!url) {
+                alert('Veuillez entrer une URL valide');
+                return;
+            }
+
+            currentMode = 'scan';
+            showLoading('scanLoading');
+            hideResults();
+
+            try {
+                const response = await fetch('/api/scan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url,
+                        depth,
+                        includeAssets,
+                        userAgent,
+                        location,
+                        followRedirects
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentResults = data;
+                    displayScanResults(data);
+                } else {
+                    throw new Error(data.error || 'Erreur lors de l\'analyse');
+                }
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            } finally {
+                hideLoading('scanLoading');
+            }
+        });
+
+        // Gestion du formulaire de scraping
+        document.getElementById('scrapeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const url = document.getElementById('scrapeUrl').value;
+            const pages = parseInt(document.getElementById('scrapePages').value);
+            const includeAssets = document.getElementById('scrapeAssets').checked;
+            const userAgent = document.getElementById('scrapeUserAgent').value;
+            const location = document.getElementById('scrapeLocation').value;
+            const followRedirects = document.getElementById('scrapeRedirects').checked;
+
+            if (!url) {
+                alert('Veuillez entrer une URL valide');
+                return;
+            }
+
+            currentMode = 'scrape';
+            showLoading('scrapeLoading');
+            hideResults();
+
+            try {
+                const response = await fetch('/api/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url,
+                        pages,
+                        includeAssets,
+                        userAgent,
+                        location,
+                        followRedirects
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentResults = data;
+                    displayScrapeResults(data);
+                } else {
+                    throw new Error(data.error || 'Erreur lors du scraping');
+                }
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            } finally {
+                hideLoading('scrapeLoading');
+            }
+        });
+
+        function showLoading(elementId) {
+            document.getElementById(elementId).style.display = 'block';
+        }
+
+        function hideLoading(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        function showResults() {
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideResults() {
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function displayScanResults(data) {
+            const resultsTitle = document.getElementById('resultsTitle');
+            const resultsSummary = document.getElementById('resultsSummary');
+            const resultsContent = document.getElementById('resultsContent');
+
+            resultsTitle.innerHTML = '🔍 Résultats de l\'Analyse de Sécurité';
+
+            // Affichage du résumé
+            resultsSummary.innerHTML = `
+                <div class="summary-stats">
+                    <div class="stat-box">
+                        <span class="stat-number">${data.résumé.totalPages}</span>
+                        <span>Pages analysées</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number critical">${data.résumé.faillesCritiques}</span>
+                        <span>Failles critiques</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number medium">${data.résumé.faillesMoyennes}</span>
+                        <span>Failles moyennes</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number low">${data.résumé.faillesFaibles}</span>
+                        <span>Failles faibles</span>
+                    </div>
+                </div>
+            `;
+
+            // Affichage des résultats par page
+            let contentHtml = '';
+            
+            if (data.pages.length === 0) {
+                contentHtml = '<div class="no-results">Aucune page analysée</div>';
+            } else {
+                data.pages.forEach(page => {
+                    contentHtml += `
+                        <div class="page-result">
+                            <div class="page-url">
+                                📄 ${page.url}
+                                <span style="color: ${page.status === 'error' ? '#f44336' : '#4caf50'}; font-size: 0.9em; margin-left: 10px;">
+                                    (${page.status})
+                                </span>
+                            </div>
+                    `;
+
+                    if (page.failles && page.failles.length > 0) {
+                        page.failles.forEach(faille => {
+                            const severityClass = faille.niveau === 'critique' ? 'critical' : 
+                                                faille.niveau === 'moyen' ? 'medium' : 'low';
+                            contentHtml += `
+                                <div class="vulnerability ${severityClass}">
+                                    <div class="vuln-type">${faille.type} (${faille.niveau})</div>
+                                    <div class="vuln-details">${faille.détails}</div>
+                                    <div class="vuln-recommendation">💡 ${faille.recommandation}</div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        contentHtml += '<div style="color: #4caf50; padding: 10px;">✅ Aucune faille détectée</div>';
+                    }
+
+                    contentHtml += '</div>';
+                });
+            }
+
+            resultsContent.innerHTML = contentHtml;
+            showResults();
+        }
+
+        function displayScrapeResults(data) {
+            const resultsTitle = document.getElementById('resultsTitle');
+            const resultsSummary = document.getElementById('resultsSummary');
+            const resultsContent = document.getElementById('resultsContent');
+
+            resultsTitle.innerHTML = '🕸️ Résultats du Scraping';
+
+            // Affichage du résumé
+            resultsSummary.innerHTML = `
+                <div class="summary-stats">
+                    <div class="stat-box">
+                        <span class="stat-number">${data.totalPages}</span>
+                        <span>Pages scrapées</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">${data.requestedPages}</span>
+                        <span>Pages demandées</span>
+                    </div>
+                </div>
+            `;
+
+            // Affichage des résultats par page
+            let contentHtml = '';
+            
+            if (data.pages.length === 0) {
+                contentHtml = '<div class="no-results">Aucune page scrapée</div>';
+            } else {
+                data.pages.forEach(page => {
+                    contentHtml += `
+                        <div class="page-result">
+                            <div class="page-url">
+                                📄 ${page.url}
+                                <span style="color: ${page.status === 'error' ? '#f44336' : '#4caf50'}; font-size: 0.9em; margin-left: 10px;">
+                                    (${page.status})
+                                </span>
+                            </div>
+                    `;
+
+                    if (page.status !== 'error') {
+                        contentHtml += `
+                            <div class="page-content">
+                                <div class="content-section">
+                                    <h4>📋 Informations générales</h4>
+                                    <p><strong>Titre:</strong> ${page.title}</p>
+                                    ${page.description ? `<p><strong>Description:</strong> ${page.description}</p>` : ''}
+                                </div>
+                        `;
+
+                        // H1
+                        if (page.h1.length > 0) {
+                            contentHtml += `
+                                <div class="content-section">
+                                    <h4>📝 Titres H1 (${page.h1.length})</h4>
+                                    <div class="links-list">
+                                        ${page.h1.map(h1 => `<div class="link-item">${h1}</div>`).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        // Liens
+                        if (page.liens.length > 0) {
+                            contentHtml += `
+                                <div class="content-section">
+                                    <h4>🔗 Liens trouvés (${page.liens.length})</h4>
+                                    <div class="links-list">
+                                        ${page.liens.slice(0, 20).map(link => `
+                                            <div class="link-item">
+                                                <span class="${link.internal ? 'internal-link' : 'external-link'}">
+                                                    ${link.internal ? '🔗' : '🌐'} ${link.text || 'Sans texte'}
+                                                </span>
+                                                <br><small>${link.url}</small>
+                                            </div>
+                                        `).join('')}
+                                        ${page.liens.length > 20 ? `<div class="link-item"><em>... et ${page.liens.length - 20} autres liens</em></div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        // Images
+                        if (page.images.length > 0) {
+                            contentHtml += `
+                                <div class="content-section">
+                                    <h4>🖼️ Images trouvées (${page.images.length})</h4>
+                                    <div class="images-list">
+                                        ${page.images.slice(0, 10).map(img => `
+                                            <div class="image-item">
+                                                <strong>${img.alt || 'Sans alt'}</strong>
+                                                <br><small>${img.src}</small>
+                                            </div>
+                                        `).join('')}
+                                        ${page.images.length > 10 ? `<div class="image-item"><em>... et ${page.images.length - 10} autres images</em></div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        // CSS et Scripts (si includeAssets)
+                        if (page.css.length > 0) {
+                            contentHtml += `
+                                <div class="content-section">
+                                    <h4>🎨 CSS trouvés (${page.css.length})</h4>
+                                    <div class="links-list">
+                                        ${page.css.slice(0, 10).map(css => `
+                                            <div class="link-item">
+                                                ${css.type === 'external' ? `🔗 ${css.url}` : '📝 CSS inline'}
+                                            </div>
+                                        `).join('')}
+                                        ${page.css.length > 10 ? `<div class="link-item"><em>... et ${page.css.length - 10} autres fichiers CSS</em></div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        if (page.scripts.length > 0) {
+                            contentHtml += `
+                                <div class="content-section">
+                                    <h4>⚡ Scripts trouvés (${page.scripts.length})</h4>
+                                    <div class="links-list">
+                                        ${page.scripts.slice(0, 10).map(script => `
+                                            <div class="link-item">
+                                                ${script.type === 'external' ? `🔗 ${script.url}` : '📝 Script inline'}
+                                            </div>
+                                        `).join('')}
+                                        ${page.scripts.length > 10 ? `<div class="link-item"><em>... et ${page.scripts.length - 10} autres scripts</em></div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        // Formulaires
+                        if (page.formulaires.length > 0) {
+                            contentHtml += `
+                                <div class="content-section">
+                                    <h4>📝 Formulaires trouvés (${page.formulaires.length})</h4>
+                                    <div class="forms-list">
+                                        ${page.formulaires.map((form, index) => `
+                                            <div class="form-item">
+                                                <strong>Formulaire ${index + 1}</strong> - ${form.method.toUpperCase()}
+                                                <br><small>Action: ${form.action}</small>
+                                                <br><small>Champs: ${form.inputs.map(input => input.name || input.type).join(', ')}</small>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        contentHtml += '</div>';
+                    } else {
+                        contentHtml += `<div style="color: #f44336; padding: 10px;">❌ Erreur: ${page.error}</div>`;
+                    }
+
+                    contentHtml += '</div>';
+                });
+            }
+
+            resultsContent.innerHTML = contentHtml;
+            showResults();
+        }
+    </script>
+</body>
+</html>
